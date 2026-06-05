@@ -61,32 +61,10 @@ Set `CSV_PATH` and `OUT_DIR` in `src/run_ml_ad_vs_control.py`, then:
 python src/run_ml_ad_vs_control.py
 ```
 
----
-
-## Pipeline summary
-
-```mermaid
-flowchart LR
-    A[Raw EEG .mat] --> B[Channel QC]
-    B --> C[Spherical interpolation]
-    C --> D[Notch + bandpass filter]
-    D --> E[Average re-reference]
-    E --> F[.npz files]
-    F --> G[Feature extraction\nnot included]
-    G --> H[Feature matrix CSV]
-    H --> I[Band / region subsets]
-    I --> J[GroupKFold CV\n5 folds by subject]
-    J --> K[LR · SVM · RF · XGB · CAT]
-    K --> L[SUMMARY_MASTER.csv]
-```
-
----
-
 ## Outputs
 
 | File | Contents |
 |---|---|
-| `SUMMARY_MASTER.csv` | All results across all feature blocks |
 | `SUMMARY_*.csv` | Results per block (ORIGINAL, BY_BAND_POWER, BY_BAND_ALL, FRONTAL_ONLY) |
 | `*__folds.csv` | Per-fold ACC, F1 (macro), AUC |
 | `*__FI_mean.csv` | Mean feature importance across folds |
