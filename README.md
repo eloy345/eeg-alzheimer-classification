@@ -11,8 +11,9 @@ repo/
 ├── README.md
 ├── requirements.txt
 ├── src/
-│   ├── preprocess_eeg.py        # EEG preprocessing (.mat → .npz)
-│   └── run_ml_ad_vs_control.py  # Feature-based AD vs. HC classification
+│   ├── preprocess_eeg.py        # Step 1: raw .mat → preprocessed .npz
+│   ├── extract_features.py      # Step 2: .npz → feature matrix CSV
+│   └── run_ml_ad_vs_control.py  # Step 3: classification (AD vs. HC)
 ├── docs/
 │   └── pipeline_description.md
 └── results/                     # output directory (not tracked)
@@ -41,8 +42,6 @@ Each file contains a 14-channel EEG array (shape `14×T` or `T×14`), in µV.
 A pre-computed feature matrix CSV (`data/features_ml_full.csv`) with columns:  
 `file`, `subject_id`, `group`, `emotion`, plus numeric feature columns.
 
-> Feature extraction (`.npz` → feature CSV) is not included in this repository.
-
 ---
 
 ## How to run
@@ -54,17 +53,27 @@ Set `BASE_IN` and `BASE_OUT` in `src/preprocess_eeg.py`, then:
 python src/preprocess_eeg.py
 ```
 
-**Step 2 — Classification**
+**Step 2 — Feature extraction**
+
+Set `BASE_IN` and `OUT_CSV` in `src/extract_features.py`, then:
+```bash
+python src/extract_features.py
+```
+
+**Step 3 — Classification**
 
 Set `CSV_PATH` and `OUT_DIR` in `src/run_ml_ad_vs_control.py`, then:
 ```bash
 python src/run_ml_ad_vs_control.py
 ```
 
+---
+
 ## Outputs
 
 | File | Contents |
 |---|---|
+| `SUMMARY_MASTER.csv` | All results across all feature blocks |
 | `SUMMARY_*.csv` | Results per block (ORIGINAL, BY_BAND_POWER, BY_BAND_ALL, FRONTAL_ONLY) |
 | `*__folds.csv` | Per-fold ACC, F1 (macro), AUC |
 | `*__FI_mean.csv` | Mean feature importance across folds |
@@ -78,3 +87,5 @@ python src/run_ml_ad_vs_control.py
 - Cross-validation grouped by `subject_id` (no subject in both train and test).
 - Missing values imputed with column median, fitted on training fold only.
 - No global normalisation before splitting; StandardScaler applied within each fold pipeline.
+
+---
